@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+nltk
+rank-bm25
+scikit-learn
+sentence-transformers
+faiss-cpu
+numpy
+joblib
+pytest
+httpx
