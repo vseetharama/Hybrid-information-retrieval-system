@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hybrid IR</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">HYBRID INFORMATION RETRIEVAL</p>
+      <h1>Find the signal<br><em>in the corpus.</em></h1>
+      <p class="intro">BM25, TF-IDF, and semantic search fused into one inspectable ranking.</p>
+    </header>
+    <section class="controls" aria-label="Search controls">
+      <label for="query">Query</label>
+      <div class="search-row">
+        <input id="query" type="search" placeholder="Try: machine learning algorithms" autocomplete="off">
+        <input id="top-k" type="number" min="1" value="5" aria-label="Top K">
+        <button id="search-button">Search</button>
+      </div>
+      <div class="actions"><button id="index-button" class="quiet">Rebuild index</button><button id="evaluate-button" class="quiet">Run evaluation</button><span id="status" role="status"></span></div>
+    </section>
+    <section id="evaluation" class="evaluation" hidden></section>
+    <section id="results" class="results" aria-live="polite"><p class="empty">Search the corpus to inspect ranked evidence.</p></section>
+  </main>
+  <script src="/static/script.js"></script>
+</body>
+</html>
