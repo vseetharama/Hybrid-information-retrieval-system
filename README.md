@@ -170,6 +170,57 @@ python -m uvicorn api:app --reload
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in a browser. Use **Rebuild index** in the web interface before searching if the generated artifacts are missing or the corpus has changed.
 
+### Teammate handoff: run and use the project
+
+1. Open PowerShell in the project directory.
+2. Create and activate the virtual environment, then install the dependencies:
+
+  ```powershell
+  python -m venv .venv
+  .\.venv\Scripts\Activate.ps1
+  pip install -r requirements.txt
+  ```
+
+3. Start the backend:
+
+  ```powershell
+  python -m uvicorn api:app --reload
+  ```
+
+  The application is available at `http://127.0.0.1:8000`. The alternative entry point `python main.py` also starts Uvicorn using the host and port in `config.py`.
+
+4. Open the URL in a browser. The frontend is served by FastAPI from `frontend/index.html`.
+5. Click **Rebuild index** before the first search, or after changing `data/documents.json`. This calls `POST /index`, preprocesses the documents, creates the BM25 and TF-IDF indexes, generates Sentence Transformer embeddings, normalizes them, and writes the generated files under `artifacts/`.
+6. Enter a query such as `machine learning algorithms` and choose the number of results. The frontend sends the query to `POST /search`.
+7. Review each result's document information, snippet, BM25 score and rank, TF-IDF score and rank, semantic score and rank, RRF score, and final rank.
+8. Click **Evaluate** to call `POST /evaluate`. The evaluation uses `data/ground_truth.json` and displays mean Precision@K, mean Recall@K, and MRR.
+
+### How one search works internally
+
+For every `/search` request, the backend:
+
+1. Validates the query and requested result count.
+2. Applies the same NLTK preprocessing used for the document corpus.
+3. Retrieves and ranks documents with BM25Okapi.
+4. Computes TF-IDF cosine-similarity scores and ranks the documents.
+5. Encodes the query with `all-MiniLM-L6-v2`, normalizes the embedding, and searches the FAISS inner-product index.
+6. Combines the three rankings with RRF using `k = 60`.
+7. Sorts the fused results, assigns the final rank, adds a short content snippet, and returns the response through FastAPI.
+
+### How to update the project
+
+- Update the document corpus in `data/documents.json` and rebuild the index.
+- Update relevance judgments in `data/ground_truth.json` before running evaluation.
+- Change model, port, RRF, or default result settings in `config.py`.
+- Change preprocessing behavior in `preprocess.py`.
+- Change index construction in `indexer.py`.
+- Change retrieval and fusion behavior in `search_engine.py`.
+- Change API validation or endpoints in `api.py`.
+- Change the browser interface in `frontend/index.html`, `frontend/script.js`, and `frontend/style.css`.
+- Run `pytest -q` after code changes.
+
+Generated files in `artifacts/` are disposable outputs. If they are missing or stale, use **Rebuild index** rather than editing them manually.
+
 ## 12. API Endpoints
 
 | Method | Endpoint | Purpose |
